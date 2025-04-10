@@ -7,12 +7,22 @@ void Game::run() {
 	while (true) {
 		if (_kbhit()) {
 			char key = _getch();
-			if (key == 75) {
-				if (current.x > 0)
+			if (key == 75 && current.x >0) {
+				Tetromino temp = current;
+				temp.x--;
+				if (!board.checkCollision(temp))
 					current.x--;
-			} else if (key == 77) {
-				if (current.x < 8)
+			} else if (key == 77 && current.x < 7) {
+				Tetromino temp = current;
+				temp.x++;
+				if (!board.checkCollision(temp))
 					current.x++;
+			}
+			else if (key == 'z' || key == 72) {
+				Tetromino temp = current;
+				temp.rotate();
+				if (!board.checkCollision(temp))
+					current = temp;
 			}
 			else if (key == 27) {
 				break;

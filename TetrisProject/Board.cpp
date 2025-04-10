@@ -20,8 +20,8 @@ void Board::draw(const Tetromino& t, int score) {
 		for (int j = 0; j < 10; ++j)
 			display[i][j] = grid[i][j];
 
-	for (int i = 0; i < 2; ++i)
-		for (int j = 0; j < 2; ++j)
+	for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j)
 			if (t.shape[i][j] == '#')
 				display[t.y + i][t.x + j] = '#';
 
@@ -35,14 +35,14 @@ void Board::draw(const Tetromino& t, int score) {
 	std::cout << "Á¡¼ö : " << score << std::endl;
 }
 	void Board::placeTetromino(const Tetromino & t) {
-		for (int i = 0; i < 2; ++i)
-			for (int j = 0; j < 2; ++j)
+		for (int i = 0; i < 4; ++i)
+			for (int j = 0; j < 4; ++j)
 				if (t.shape[i][j] == '#')
 					grid[t.y + i][t.x + j] = '#';
 	}
 	bool Board::checkCollision(const Tetromino& t) {
-		for (int i = 0; i < 2; ++i) {
-			for (int j = 0; j < 2; ++j) {
+		for (int i = 0; i < 4; ++i) {
+			for (int j = 0; j < 4; ++j) {
 				if (t.shape[i][j] == '#') {
 					int newY = t.y + i;
 					int newX = t.x + j;
