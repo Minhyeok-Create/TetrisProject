@@ -26,17 +26,26 @@ void Game::run() {
 		}
 		else {
 			board.placeTetromino(current);
-			board.clearFullLines();
+			int lines = board.clearFullLines();
+			switch (lines) {
+			case 1: score += 100; break;
+			case 2: score += 300; break;
+			case 3: score += 500; break;
+			case 4: score += 800; break;
+			default: break;
+			}
+
 			current = Tetromino();
 
 			if (board.checkCollision(current)) {
-				board.draw(current);
+				board.draw(current,score);
 				std::cout << "게임 오버!" << std::endl;
 				break;
 			}
 		}
+	
 
-		board.draw(current);
+		board.draw(current, score);
 		Sleep(300);
 
 	}

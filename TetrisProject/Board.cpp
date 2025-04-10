@@ -12,7 +12,7 @@ void Board::clearScreen() {
 	system("cls");
 }
 
-void Board::draw(const Tetromino& t) {
+void Board::draw(const Tetromino& t, int score) {
 	clearScreen();
 
 	char display[20][10];
@@ -31,6 +31,8 @@ void Board::draw(const Tetromino& t) {
 			std::cout << display[i][j];
 		std::cout << "|" << std::endl;
 	}
+
+	std::cout << "Á¡¼ö : " << score << std::endl;
 }
 	void Board::placeTetromino(const Tetromino & t) {
 		for (int i = 0; i < 2; ++i)
@@ -52,7 +54,9 @@ void Board::draw(const Tetromino& t) {
 		}
 		return false;
 	}
-	void Board::clearFullLines() {
+	int Board::clearFullLines() {
+		int linesCleared = 0;
+
 		for (int i = 19; i >= 0; --i) {
 			bool full = true;
 			for (int j = 0; j < 10; ++j) {
@@ -62,6 +66,8 @@ void Board::draw(const Tetromino& t) {
 				}
 			}
 			if (full) {
+				linesCleared++;
+
 				for (int row = i; row > 0; --row) {
 					for (int col = 0; col < 10; ++col) {
 						grid[row][col] = grid[row - 1][col];
@@ -73,5 +79,6 @@ void Board::draw(const Tetromino& t) {
 				i++;
 			}
 		}
+		return linesCleared;
 	}
 

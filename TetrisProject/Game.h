@@ -7,4 +7,5 @@ public:
 private:
 	Board board;
 	Tetromino current;
+	int score = 0;
 };
