@@ -30,6 +30,48 @@ void Board::draw(const Tetromino& t) {
 		for (int j = 0; j < 10; ++j)
 			std::cout << display[i][j];
 		std::cout << "|" << std::endl;
-
 	}
 }
+	void Board::placeTetromino(const Tetromino & t) {
+		for (int i = 0; i < 2; ++i)
+			for (int j = 0; j < 2; ++j)
+				if (t.shape[i][j] == '#')
+					grid[t.y + i][t.x + j] = '#';
+	}
+	bool Board::checkCollision(const Tetromino& t) {
+		for (int i = 0; i < 2; ++i) {
+			for (int j = 0; j < 2; ++j) {
+				if (t.shape[i][j] == '#') {
+					int newY = t.y + i;
+					int newX = t.x + j;
+
+					if (newY >= 20 || newX < 0 || newX >= 10) return true;
+					if (grid[newY][newX] == '#') return true;
+				}
+			}
+		}
+		return false;
+	}
+	void Board::clearFullLines() {
+		for (int i = 19; i >= 0; --i) {
+			bool full = true;
+			for (int j = 0; j < 10; ++j) {
+				if (grid[i][j] != '#') {
+					full = false;
+					break;
+				}
+			}
+			if (full) {
+				for (int row = i; row > 0; --row) {
+					for (int col = 0; col < 10; ++col) {
+						grid[row][col] = grid[row - 1][col];
+					}
+				}
+				for (int col = 0; col < 10; ++col) {
+					grid[0][col] = ' ';
+				}
+				i++;
+			}
+		}
+	}
+

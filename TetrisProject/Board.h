@@ -8,4 +8,11 @@ public:
 	Board();
 	void draw(const Tetromino& t);
 	void clearScreen();
+
+	void placeTetromino(const Tetromino& t);
+	bool checkCollision(const Tetromino& t);
+	void clearFullLines();
+
+	
 };
+

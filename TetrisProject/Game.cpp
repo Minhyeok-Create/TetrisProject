@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <conio.h>
 #include <windows.h>
+#include <iostream>
 
 void Game::run() {
 	while (true) {
@@ -17,9 +18,25 @@ void Game::run() {
 				break;
 			}
 		}
+		Tetromino next = current;
+		next.y++;
+
+		if (!board.checkCollision(next)) {
+			current.y++;
+		}
+		else {
+			board.placeTetromino(current);
+			board.clearFullLines();
+			current = Tetromino();
+
+			if (board.checkCollision(current)) {
+				board.draw(current);
+				std::cout << "게임 오버!" << std::endl;
+				break;
+			}
+		}
+
 		board.draw(current);
-		current.y++;
-		if (current.y > 17) current.y = 17;
 		Sleep(300);
 
 	}
