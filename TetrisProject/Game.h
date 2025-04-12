@@ -8,4 +8,6 @@ private:
 	Board board;
 	Tetromino current;
 	int score = 0;
+	int level = 1;
+	int speed = 500;
 };

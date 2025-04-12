@@ -6,7 +6,7 @@ public:
 	char grid[20][10];
 
 	Board();
-	void draw(const Tetromino& t, int score);
+	void draw(const Tetromino& t, int score, int level);
 	void clearScreen();
 
 	void placeTetromino(const Tetromino& t);

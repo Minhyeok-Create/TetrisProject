@@ -12,7 +12,7 @@ void Board::clearScreen() {
 	system("cls");
 }
 
-void Board::draw(const Tetromino& t, int score) {
+void Board::draw(const Tetromino& t, int score, int level) {
 	clearScreen();
 
 	char display[20][10];
@@ -32,7 +32,7 @@ void Board::draw(const Tetromino& t, int score) {
 		std::cout << "|" << std::endl;
 	}
 
-	std::cout << "점수 : " << score << std::endl;
+	std::cout << "점수 : " << score << "   레벨 : " << level << std::endl;
 }
 	void Board::placeTetromino(const Tetromino & t) {
 		for (int i = 0; i < 4; ++i)

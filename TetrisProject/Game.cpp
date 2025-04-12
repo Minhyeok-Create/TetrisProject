@@ -1,8 +1,10 @@
+#define NOMINMAX
 #include "Game.h"
 #include <conio.h>
 #include <windows.h>
 #include <iostream>
 #include <chrono>
+#include <algorithm>
 
 void Game::run() {
 	auto lastFall = std::chrono::steady_clock::now();
@@ -11,19 +13,32 @@ void Game::run() {
 		if (_kbhit()) {
 			char key = _getch();
 			Tetromino temp = current;
-			if (key == 75 && current.x >0) {
+			if (key == 75) {
 				temp.x--;
 				if (!board.checkCollision(temp))
 					current.x--;
-			} else if (key == 77 && current.x < 7) {
+			} else if (key == 77 ) {
 				temp.x++;
 				if (!board.checkCollision(temp))
 					current.x++;
 			}
 			else if (key == 'z' || key == 72) {
-				temp.rotate();
-				if (!board.checkCollision(temp))
-					current = temp;
+				Tetromino rotated = current;
+				rotated.rotate();
+
+				bool rotatedOK = false;
+				for (int dx = -1; dx <= 1; ++dx) {
+					Tetromino temp = rotated;
+					temp.x += dx;
+					if (!board.checkCollision(temp)) {
+						current = temp;
+						rotatedOK = true;
+						break;
+					}
+				}
+				if (!rotatedOK) {
+
+				}
 			}
 			else if (key == 27) {
 				break;
@@ -31,7 +46,7 @@ void Game::run() {
 		}
 		auto now = std::chrono::steady_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - lastFall);
-		if (duration.count() > 300) {
+		if (duration.count() > speed) {
 			Tetromino next = current;
 			next.y++;
 
@@ -48,11 +63,14 @@ void Game::run() {
 				case 4: score += 800; break;
 				default: break;
 				}
+				level = score / 1000 + 1;
+				int fallSpeed = 500 - (level - 1) * 40;
+				speed = std::max(100, fallSpeed);
 
 				current = Tetromino();
 
 				if (board.checkCollision(current)) {
-					board.draw(current, score);
+					board.draw(current, score, level);
 					std::cout << "게임 오버!" << std::endl;
 					break;
 				}
@@ -60,7 +78,7 @@ void Game::run() {
 			lastFall = now;
 		}
 
-		board.draw(current, score);
+		board.draw(current, score, level);
 		Sleep(10);
 
 	}
