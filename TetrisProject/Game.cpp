@@ -40,6 +40,18 @@ void Game::run() {
 
 				}
 			}
+			else if (key == 80) {
+				Tetromino dropped = current;
+				while (true) {
+					Tetromino next = dropped;
+					next.y++;
+					if (board.checkCollision(next)) break;
+					dropped.y++;
+				}
+				current = dropped;
+				board.placeTetromino(current);
+
+			}
 			else if (key == 27) {
 				break;
 			}
@@ -75,7 +87,8 @@ void Game::run() {
 					break;
 				}
 			}
-			lastFall = now;
+			lastFall = std::chrono::steady_clock::now();
+			continue;
 		}
 
 		board.draw(current, score, level);
