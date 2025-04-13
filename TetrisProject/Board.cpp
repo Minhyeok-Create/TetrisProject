@@ -12,13 +12,23 @@ void Board::clearScreen() {
 	system("cls");
 }
 
-void Board::draw(const Tetromino& t, int score, int level) {
+void Board::draw(const Tetromino& t, const Tetromino& ghost, int score, int level) {
 	clearScreen();
 
 	char display[20][10];
 	for (int i = 0; i < 20; ++i)
 		for (int j = 0; j < 10; ++j)
 			display[i][j] = grid[i][j];
+
+	for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j)
+			if(ghost.shape[i][j] == '#') {
+			int x = ghost.x + j;
+			int y = ghost.y + i;
+			if (y >= 0 && y < 20 && x >= 0 && x < 10 && display[y][x] == ' ')
+				display[y][x] = '.';
+		}
+
 
 	for (int i = 0; i < 4; ++i)
 		for (int j = 0; j < 4; ++j)

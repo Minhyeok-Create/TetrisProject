@@ -8,8 +8,15 @@
 
 void Game::run() {
 	auto lastFall = std::chrono::steady_clock::now();
-
 	while (true) {
+		Tetromino ghost = current;
+		while (true) {
+			Tetromino next = ghost;
+			next.y++;
+			if (board.checkCollision(next)) break;
+			ghost.y++;
+		}
+
 		if (_kbhit()) {
 			char key = _getch();
 			Tetromino temp = current;
@@ -82,7 +89,7 @@ void Game::run() {
 				current = Tetromino();
 
 				if (board.checkCollision(current)) {
-					board.draw(current, score, level);
+					board.draw(current, ghost, score, level);
 					std::cout << "게임 오버!" << std::endl;
 					break;
 				}
@@ -91,7 +98,7 @@ void Game::run() {
 			continue;
 		}
 
-		board.draw(current, score, level);
+		board.draw(current, ghost, score, level);
 		Sleep(10);
 
 	}
