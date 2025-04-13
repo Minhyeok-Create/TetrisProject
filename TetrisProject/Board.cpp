@@ -1,6 +1,5 @@
 #include "Board.h"
-#include <iostream>
-#include <windows.h>
+#include <SFML/Graphics.hpp>
 
 Board::Board() {
 	for (int i = 0; i < 20; ++i)
@@ -8,41 +7,46 @@ Board::Board() {
 			grid[i][j] = ' ';
 }
 
-void Board::clearScreen() {
-	system("cls");
-}
 
-void Board::draw(const Tetromino& t, const Tetromino& ghost, int score, int level) {
-	clearScreen();
+void Board::draw(sf::RenderWindow& window, const Tetromino& t, const Tetromino& ghost, int score, int level) {
+	
+	const float blockSize = 30.f;
+	sf::RectangleShape block(sf::Vector2f(blockSize, blockSize));
+	block.setOutlineThickness(1.f);
+	block.setOutlineColor(sf::Color::Black);
 
-	char display[20][10];
-	for (int i = 0; i < 20; ++i)
-		for (int j = 0; j < 10; ++j)
-			display[i][j] = grid[i][j];
 
-	for (int i = 0; i < 4; ++i)
-		for (int j = 0; j < 4; ++j)
-			if(ghost.shape[i][j] == '#') {
-			int x = ghost.x + j;
-			int y = ghost.y + i;
-			if (y >= 0 && y < 20 && x >= 0 && x < 10 && display[y][x] == ' ')
-				display[y][x] = '.';
+	for (int y = 0; y < 20; ++y) {
+		for (int x = 0; x < 10; ++x) {
+			if (grid[y][x] == '#') {
+				block.setFillColor(sf::Color::Blue);
+				block.setPosition(sf::Vector2f(x * blockSize, y * blockSize));
+				window.draw(block);
+			}
 		}
-
-
+	}
 	for (int i = 0; i < 4; ++i)
 		for (int j = 0; j < 4; ++j)
-			if (t.shape[i][j] == '#')
-				display[t.y + i][t.x + j] = '#';
+			if (ghost.shape[i][j] == '#') {
+				int x = ghost.x + j;
+				int y = ghost.y + i;
+				if (y >= 0 && y < 20 && x >= 0 && grid[y][x] == ' ') {
+					block.setFillColor(sf::Color(200, 200, 200, 100));
+					block.setPosition(sf::Vector2f(x * blockSize, y * blockSize));
+					window.draw(block);
+				}
+			}
+	for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j)
+			if (t.shape[i][j] == '#') {
+				int x = t.x + j;
+				int y = t.y + i;
+				block.setFillColor(sf::Color::Cyan);
+				block.setPosition(sf::Vector2f(x * blockSize, y * blockSize));
+				window.draw(block);
+			}
 
-	for (int i = 0; i < 20; ++i) {
-		std::cout << "|";
-		for (int j = 0; j < 10; ++j)
-			std::cout << display[i][j];
-		std::cout << "|" << std::endl;
-	}
-
-	std::cout << "점수 : " << score << "   레벨 : " << level << std::endl;
+	
 }
 	void Board::placeTetromino(const Tetromino & t) {
 		for (int i = 0; i < 4; ++i)

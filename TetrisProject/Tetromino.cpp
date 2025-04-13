@@ -5,7 +5,7 @@
 Tetromino::Tetromino() {
 
     x = 3;
-    y = 0;
+    y = 3;
     srand(time(nullptr));
     type = static_cast<TetrominoType>(rand() % 7);
 
