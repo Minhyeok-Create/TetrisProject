@@ -1,6 +1,4 @@
-﻿// Game.cpp - SFML 3.0.0 호환 버전
-
-#include "Game.h"
+﻿#include "Game.h"
 #include <iostream>
 #include <algorithm>
 #include <chrono>
@@ -33,7 +31,6 @@ void Game::run() {
 
     auto lastFall = std::chrono::steady_clock::now();
 
-    // 메뉴 텍스트
     sf::Text title(font, L"테트리스", 48);
     title.setPosition(sf::Vector2f(230, 150));
     title.setFillColor(sf::Color::White);
@@ -288,7 +285,7 @@ void Game::drawHold(sf::RenderWindow& window) {
         }
     }
 
-    sf::Text label{ font, L"보류", 24 };
+    sf::Text label{ font, L"저장", 24 };
     label.setFillColor(sf::Color::White);
     label.setPosition({ 600.f, 220.f });
     window.draw(label);

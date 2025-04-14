@@ -38,7 +38,6 @@ private:
 	std::chrono::steady_clock::time_point bonusTimer;
 	bool showBonus = false;
 
-	// 내부 함수
 	void drawNext(sf::RenderWindow& window);
 	void drawHold(sf::RenderWindow& window);
 	void drawBonus(sf::RenderWindow& window);
