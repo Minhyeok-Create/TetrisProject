@@ -17,4 +17,7 @@ private:
 	sf::Font font;
 	sf::Text scoreText;
 	sf::Text levelText;
+
+	void drawNext(sf::RenderWindow& window);
+	Tetromino next;
 };
