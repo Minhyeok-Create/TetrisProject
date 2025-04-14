@@ -13,7 +13,6 @@ Game::Game()
 		std::cerr << "폰트 로드 오류" << std::endl;
 	}
 
-
 	scoreText.setString(sf::String(L"점수 : 0"));
 	scoreText.setCharacterSize(24);
 	scoreText.setFillColor(sf::Color::White);
@@ -27,6 +26,12 @@ Game::Game()
 
 
 void Game::run() {
+	sf::Text startText(font);
+	startText.setString(L"아무 키나 눌러 시작");
+	startText.setCharacterSize(32);
+	startText.setFillColor(sf::Color::White);
+	startText.setPosition(sf::Vector2f(200, 250));
+
 	current = Tetromino();
 	next = Tetromino();
 	sf::RenderWindow window(sf::VideoMode({ 800, 600 }, 32), "SFML 3.0.0 테트리스");
@@ -41,6 +46,19 @@ void Game::run() {
 	auto lastFall = std::chrono::steady_clock::now();
 
 	while (window.isOpen()) {
+		if (!gameStarted) {
+			while (const std::optional<sf::Event> event = window.pollEvent()) {
+				if (event->is<sf::Event::Closed>())
+					window.close();
+				else if (event->is<sf::Event::KeyPressed>())
+					gameStarted = true;
+			}			
+			window.clear(sf::Color::Black);
+			window.draw(startText);
+			window.display();
+			continue; 
+		}
+	
 		Tetromino ghost = current;
 		while (true) {
 			Tetromino next = ghost;
@@ -49,13 +67,34 @@ void Game::run() {
 			ghost.y++;
 		}
 		while (const std::optional<sf::Event> event = window.pollEvent()) {
-			if (event->is<sf::Event::Closed>())
+			if (event->is<sf::Event::Closed>()) {
 				window.close();
+			}
 
-
+			if (event->is<sf::Event::KeyReleased>()) {
+				sf::Keyboard::Key key = event->getIf<sf::Event::KeyReleased>()->code;
+				if (key == sf::Keyboard::Key::P) {
+					pKeyHeld = false;
+				}
+			}
 
 			if (event->is<sf::Event::KeyPressed>()) {
-				auto key = event->getIf<sf::Event::KeyPressed>()->code;
+				sf::Keyboard::Key key = event->getIf<sf::Event::KeyPressed>()->code;
+
+
+				if (!gameStarted) {
+					gameStarted = true;
+					continue;
+				}
+
+
+				if (key == sf::Keyboard::Key::P && !pKeyHeld) {
+					isPaused = !isPaused;
+					pKeyHeld = true;
+					continue;
+				}
+
+				if (isPaused) continue;
 
 				Tetromino temp = current;
 
@@ -97,6 +136,7 @@ void Game::run() {
 				if (isGameOver && key == sf::Keyboard::Key::Space) {
 					board = Board();
 					current = Tetromino();
+					next = Tetromino();
 					score = 0;
 					level = 1;
 					speed = 500;
@@ -138,7 +178,6 @@ void Game::run() {
 				if (board.checkCollision(next)) {
 					isGameOver = true;
 
-					// 게임 오버 메시지 출력
 					window.clear(sf::Color::Black);
 					board.draw(window, current, ghost, score, level);
 					window.draw(scoreText);
@@ -153,6 +192,17 @@ void Game::run() {
 			
 			}
 			lastFall = std::chrono::steady_clock::now();
+		}
+		if (isPaused) {
+			window.clear(sf::Color::Black);
+			sf::Text pauseText(font);
+			pauseText.setString(L"일시정지\nP 키로 계속");
+			pauseText.setCharacterSize(32);
+			pauseText.setFillColor(sf::Color::Yellow);
+			pauseText.setPosition(sf::Vector2f(200, 250));
+			window.draw(pauseText);
+			window.display();
+			continue;
 		}
 		window.clear(sf::Color::Black);
 		board.draw(window, current, ghost, score, level);

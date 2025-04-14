@@ -7,6 +7,10 @@ public:
 	Game();
 	void run();
 private:
+	bool isPaused = false;
+	bool gameStarted = false;
+	bool pKeyHeld = false;
+
 	Board board;
 	Tetromino current;
 	int score = 0;
