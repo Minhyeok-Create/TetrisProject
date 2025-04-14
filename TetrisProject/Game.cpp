@@ -1,4 +1,4 @@
-#include "Game.h"
+ï»¿#include "Game.h"
 #include <SFML/Graphics.hpp>
 #include <chrono>
 #include <algorithm>
@@ -10,15 +10,15 @@ Game::Game()
 	: scoreText(font), levelText(font) 
 {
 	if (!font.openFromFile("assets/NotoSansKR-Regular.ttf")) {
-		std::cerr << "ÆùÆ® ·Îµå ¿À·ù" << std::endl;
+		std::cerr << "í°íŠ¸ ë¡œë“œ ì˜¤ë¥˜" << std::endl;
 	}
 
-	scoreText.setString(sf::String(L"Á¡¼ö : 0"));
+	scoreText.setString(sf::String(L"ì ìˆ˜ : 0"));
 	scoreText.setCharacterSize(24);
 	scoreText.setFillColor(sf::Color::White);
 	scoreText.setPosition(sf::Vector2f(320, 30));
 
-	levelText.setString(sf::String(L"·¹º§ : 1"));
+	levelText.setString(sf::String(L"ë ˆë²¨ : 1"));
 	levelText.setCharacterSize(24);
 	levelText.setFillColor(sf::Color::White);
 	levelText.setPosition(sf::Vector2f(320, 60));
@@ -27,18 +27,18 @@ Game::Game()
 
 void Game::run() {
 	sf::Text startText(font);
-	startText.setString(L"¾Æ¹« Å°³ª ´­·¯ ½ÃÀÛ");
+	startText.setString(L"ì•„ë¬´ í‚¤ë‚˜ ëˆŒëŸ¬ ì‹œìž‘");
 	startText.setCharacterSize(32);
 	startText.setFillColor(sf::Color::White);
 	startText.setPosition(sf::Vector2f(200, 250));
 
 	current = Tetromino();
 	next = Tetromino();
-	sf::RenderWindow window(sf::VideoMode({ 800, 600 }, 32), "SFML 3.0.0 Å×Æ®¸®½º");
+	sf::RenderWindow window(sf::VideoMode({ 800, 600 }, 32), "SFML 3.0.0 í…ŒíŠ¸ë¦¬ìŠ¤");
 	window.setFramerateLimit(60);
 
 	sf::Text gameOverText(font);
-	gameOverText.setString(L"°ÔÀÓ ¿À¹ö!\n½ºÆäÀÌ½º¹Ù·Î Àç½ÃÀÛ");
+	gameOverText.setString(L"ê²Œìž„ ì˜¤ë²„!\nìŠ¤íŽ˜ì´ìŠ¤ë°”ë¡œ ìž¬ì‹œìž‘");
 	gameOverText.setCharacterSize(32);
 	gameOverText.setFillColor(sf::Color::Red);
 	gameOverText.setPosition(sf::Vector2f(100, 200));
@@ -129,6 +129,23 @@ void Game::run() {
 					current = dropped;
 					board.placeTetromino(current);
 				}
+				else if ((key == sf::Keyboard::Key::C || key == sf::Keyboard::Key::LShift) && !holdUsedThisTurn) {
+					if (!hasHold) {
+						hold = current;
+						current = next;
+						next = Tetromino();
+						current.x = 3;
+						current.y = 0;
+
+						hasHold = true;
+					}
+					else {
+						std::swap(current, hold);
+						current.x = 3;
+						current.y = 0;
+					}
+					holdUsedThisTurn = true;
+				}
 				else if (key == sf::Keyboard::Key::Escape) {
 					window.close();
 				}
@@ -142,8 +159,8 @@ void Game::run() {
 					speed = 500;
 					isGameOver = false;
 
-					scoreText.setString(L"Á¡¼ö : 0");
-					levelText.setString(L"·¹º§ : 1");
+					scoreText.setString(L"ì ìˆ˜ : 0");
+					levelText.setString(L"ë ˆë²¨ : 1");
 				}
 			}
 		}
@@ -161,14 +178,27 @@ void Game::run() {
 				int lines = board.clearFullLines();
 				switch (lines) {
 				case 1: score += 100; break;
-				case 2: score += 300; break;
-				case 3: score += 500; break;
-				case 4: score += 800; break;
+				case 2: score += 300; 
+					bonusMessage = L"ë”ë¸”!";
+					showBonus = true;
+					bonusTimer = std::chrono::steady_clock::now();
+					break;
+				case 3: score += 500; 
+					bonusMessage = L"íŠ¸ë¦¬í”Œ!";
+					showBonus = true;
+					bonusTimer = std::chrono::steady_clock::now();
+					break;
+				case 4: score += 800; 
+					score += 800;
+					bonusMessage = L"TETRIS!";
+					showBonus = true;
+					bonusTimer = std::chrono::steady_clock::now();
+					break;
 				default: break;
 				}
 				level = score / 1000 + 1;
-				scoreText.setString(sf::String(L"Á¡¼ö : ") + std::to_wstring(score));
-				levelText.setString(sf::String(L"·¹º§ : ") + std::to_wstring(level));
+				scoreText.setString(sf::String(L"ì ìˆ˜ : ") + std::to_wstring(score));
+				levelText.setString(sf::String(L"ë ˆë²¨ : ") + std::to_wstring(level));
 
 				int fallSpeed = 500 - (level - 1) * 40;
 				speed = std::max(100, fallSpeed);
@@ -183,12 +213,14 @@ void Game::run() {
 					window.draw(scoreText);
 					window.draw(levelText);
 					drawNext(window);
+					drawHold(window);
 					window.draw(gameOverText);
 					window.display();
 					continue;
 				}
 				current = next;
 				next = Tetromino();
+				holdUsedThisTurn = false;
 			
 			}
 			lastFall = std::chrono::steady_clock::now();
@@ -196,7 +228,7 @@ void Game::run() {
 		if (isPaused) {
 			window.clear(sf::Color::Black);
 			sf::Text pauseText(font);
-			pauseText.setString(L"ÀÏ½ÃÁ¤Áö\nP Å°·Î °è¼Ó");
+			pauseText.setString(L"ì¼ì‹œì •ì§€\nP í‚¤ë¡œ ê³„ì†");
 			pauseText.setCharacterSize(32);
 			pauseText.setFillColor(sf::Color::Yellow);
 			pauseText.setPosition(sf::Vector2f(200, 250));
@@ -209,6 +241,20 @@ void Game::run() {
 		window.draw(scoreText);
 		window.draw(levelText);
 		drawNext(window);
+		drawHold(window);
+		if (showBonus) {
+			auto now = std::chrono::steady_clock::now();
+			if (std::chrono::duration_cast<std::chrono::milliseconds>(now - bonusTimer).count() < 1000) {
+				sf::Text bonusText(font, bonusMessage, 28); 
+				bonusText.setFillColor(sf::Color::Cyan);
+				bonusText.setPosition(sf::Vector2f(320, 100));
+				window.draw(bonusText);
+			}
+			else {
+				showBonus = false;
+			}
+		}
+
 		window.display();
 
 	}
@@ -234,10 +280,37 @@ void Game::drawNext(sf::RenderWindow& window) {
 	}
 
 	sf::Text label(font);
-	label.setString(L"´ÙÀ½");
+	label.setString(L"ë‹¤ìŒ");
 	label.setFont(font);
 	label.setCharacterSize(24);
 	label.setFillColor(sf::Color::White);
 	label.setPosition(sf::Vector2f(600, 60));
 	window.draw(label);
 }
+
+void Game::drawHold(sf::RenderWindow& window) {
+	if (!hasHold) return;
+
+	const float blockSize = 30.f;
+	sf::RectangleShape block(sf::Vector2f(blockSize, blockSize));
+	block.setOutlineThickness(1.f);
+	block.setOutlineColor(sf::Color::Black);
+	block.setFillColor(getColorByType(hold.type));
+
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			if (hold.shape[i][j] == '#') {
+				float x = 600 + j * blockSize;
+				float y = 250 + i * blockSize;
+				block.setPosition(sf::Vector2f(x, y));
+				window.draw(block);
+			}
+		}
+	}
+
+	sf::Text label(font, L"ì €ìž¥", 24);
+	label.setFillColor(sf::Color::White);
+	label.setPosition(sf::Vector2f(600, 220));
+	window.draw(label);
+}
+
